@@ -15,28 +15,28 @@
 [34mESM[39m Build start
 Generated an empty chunk: "chunk-YIN3BRQ5".
 Generated an empty chunk: "chunk-4VPXSMVJ".
+[32mESM[39m [1mdist/chunk-YIN3BRQ5.js           [22m[32m86.00 B[39m
 [32mESM[39m [1mdist/ui/index.js                 [22m[32m598.00 B[39m
 [32mESM[39m [1mdist/adapters/index.js           [22m[32m156.00 B[39m
-[32mESM[39m [1mdist/chunk-YIN3BRQ5.js           [22m[32m86.00 B[39m
 [32mESM[39m [1mdist/index.js                    [22m[32m1.04 KB[39m
-[32mESM[39m [1mdist/chunk-VDPJWFEC.js           [22m[32m30.78 KB[39m
-[32mESM[39m [1mdist/chunk-TLEZ72BN.js           [22m[32m120.66 KB[39m
-[32mESM[39m [1mdist/chunk-MCGS2VNY.js           [22m[32m649.00 B[39m
-[32mESM[39m [1mdist/chunk-AK5DSGFF.js           [22m[32m7.69 KB[39m
-[32mESM[39m [1mdist/chunk-4VPXSMVJ.js           [22m[32m86.00 B[39m
-[32mESM[39m [1mdist/chunk-ETWULQGP.js           [22m[32m575.00 B[39m
-[32mESM[39m [1mdist/headless/types/index.js     [22m[32m159.00 B[39m
 [32mESM[39m [1mdist/headless/index.js           [22m[32m426.00 B[39m
-[32mESM[39m [1mdist/index.js.map                [22m[32m69.00 B[39m
-[32mESM[39m [1mdist/ui/index.js.map             [22m[32m69.00 B[39m
+[32mESM[39m [1mdist/headless/types/index.js     [22m[32m159.00 B[39m
+[32mESM[39m [1mdist/chunk-VDPJWFEC.js           [22m[32m30.78 KB[39m
+[32mESM[39m [1mdist/chunk-MCGS2VNY.js           [22m[32m649.00 B[39m
+[32mESM[39m [1mdist/chunk-4VPXSMVJ.js           [22m[32m86.00 B[39m
+[32mESM[39m [1mdist/chunk-AK5DSGFF.js           [22m[32m7.69 KB[39m
+[32mESM[39m [1mdist/chunk-ETWULQGP.js           [22m[32m575.00 B[39m
+[32mESM[39m [1mdist/chunk-TLEZ72BN.js           [22m[32m120.66 KB[39m
 [32mESM[39m [1mdist/chunk-YIN3BRQ5.js.map       [22m[32m78.00 B[39m
-[32mESM[39m [1mdist/chunk-VDPJWFEC.js.map       [22m[32m70.75 KB[39m
-[32mESM[39m [1mdist/chunk-TLEZ72BN.js.map       [22m[32m244.96 KB[39m
-[32mESM[39m [1mdist/chunk-MCGS2VNY.js.map       [22m[32m1.51 KB[39m
-[32mESM[39m [1mdist/chunk-AK5DSGFF.js.map       [22m[32m18.41 KB[39m
+[32mESM[39m [1mdist/ui/index.js.map             [22m[32m69.00 B[39m
+[32mESM[39m [1mdist/index.js.map                [22m[32m69.00 B[39m
+[32mESM[39m [1mdist/headless/index.js.map       [22m[32m69.00 B[39m
 [32mESM[39m [1mdist/adapters/index.js.map       [22m[32m69.00 B[39m
 [32mESM[39m [1mdist/chunk-4VPXSMVJ.js.map       [22m[32m78.00 B[39m
-[32mESM[39m [1mdist/chunk-ETWULQGP.js.map       [22m[32m1.27 KB[39m
+[32mESM[39m [1mdist/chunk-MCGS2VNY.js.map       [22m[32m1.51 KB[39m
+[32mESM[39m [1mdist/chunk-VDPJWFEC.js.map       [22m[32m70.75 KB[39m
+[32mESM[39m [1mdist/chunk-AK5DSGFF.js.map       [22m[32m18.41 KB[39m
 [32mESM[39m [1mdist/headless/types/index.js.map [22m[32m69.00 B[39m
-[32mESM[39m [1mdist/headless/index.js.map       [22m[32m69.00 B[39m
-[32mESM[39m ⚡️ Build success in 874ms
+[32mESM[39m [1mdist/chunk-ETWULQGP.js.map       [22m[32m1.27 KB[39m
+[32mESM[39m [1mdist/chunk-TLEZ72BN.js.map       [22m[32m244.96 KB[39m
+[32mESM[39m ⚡️ Build success in 448ms
