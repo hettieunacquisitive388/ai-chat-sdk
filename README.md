@@ -4,6 +4,14 @@ An industry-agnostic, embeddable AI chat SDK for React applications. Drop a full
 
 ---
 
+## Screenshots
+
+| Empty state | Streaming response with sources | Artifact panel |
+|:-----------:|:-------------------------------:|:--------------:|
+| ![ChatShell empty state — sidebar with New Chat, Search, Chats, and Platform nav; centred prompt with slash-command hint](.github/assets/anter-ai-1.png) | ![ChatShell with an AI response citing 4 inline sources and a Sources pill below the message](.github/assets/anter-ai-2.png) | ![ChatShell with the Files artifact panel open on the right side](.github/assets/anter-ai-3.png) |
+
+---
+
 ## Table of contents
 
 - [Overview](#overview)
