@@ -1,0 +1,85 @@
+name: Feature request
+description: Propose a new capability or improvement to the SDK.
+labels: ["enhancement", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, please read the [agnostic contract](../CONTRIBUTING.md#the-agnostic-contract).
+        Feature requests that introduce domain-specific concepts (legal, finance, compliance, etc.) will be asked to redesign toward a generic solution.
+
+        Describe the **use case** first — not the implementation. A clear problem statement makes it easier to design something that works for all consumers.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the SDK does this relate to?
+      multiple: true
+      options:
+        - Headless / hooks
+        - UI components
+        - ChatAdapter interface
+        - Plugin slots
+        - Slash command / command palette
+        - Artifact panel
+        - Sources panel
+        - Styles / theming
+        - Adapters
+        - Types / TypeScript DX
+        - Build / exports
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: |
+        What are you trying to do that you can't do today?
+        Concrete use cases are more useful than abstract descriptions.
+      placeholder: "When building a customer support chat I need to… but the SDK currently…"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agnostic-check
+    attributes:
+      label: Agnostic contract self-check
+      description: Confirm your proposal doesn't violate the project's core rule.
+      options:
+        - label: My request does not introduce terms specific to one industry (e.g. `compliance`, `rfpMode`, `vendor`, `audit`).
+          required: true
+        - label: Any new UI strings, config options, or slot names are position-descriptive or domain-neutral.
+          required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: |
+        How should this work from the consumer's perspective? API sketches, pseudo-code, or interface changes are all helpful.
+        If you don't have a specific proposal yet, that's fine — just describe what you need.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds have you tried? What other designs did you consider?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: willing-to-pr
+    attributes:
+      label: Are you willing to open a PR for this?
+      options:
+        - "Yes"
+        - "Yes, with guidance"
+        - "No"
+    validations:
+      required: true
