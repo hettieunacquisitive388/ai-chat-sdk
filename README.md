@@ -1412,13 +1412,19 @@ const adapter = new AskInfosecAdapter({
 
 **Constructor options:**
 
-| Option           | Type                         | Required | Description                                        |
-| ---------------- | ---------------------------- | -------- | -------------------------------------------------- |
-| `baseUrl`        | `string`                     | Yes      | Base URL for all API requests (e.g. `"/api/chat"`) |
-| `organizationId` | `string`                     | Yes      | Tenant identifier                                  |
-| `projectId`      | `string`                     | No       | Targets a specific Agent Builder project           |
-| `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent  |
-| `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request             |
+| Option           | Type                         | Required | Description                                                                                                     |
+| ---------------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `baseUrl`        | `string`                     | Yes      | Base URL for all API requests (e.g. `"/api/chat"` for Next.js route proxying, or `"/api"` for direct API proxies) |
+| `organizationId` | `string`                     | Yes      | Tenant identifier                                                                                               |
+| `projectId`      | `string`                     | No       | Targets a specific Agent Builder project                                                                        |
+| `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent                                                               |
+| `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request                                                                          |
+
+> [!IMPORTANT]
+> **Understanding the `baseUrl` path prefix:**
+> The `AskInfosecAdapter` appends the standard backend routes directly to `baseUrl` (e.g., `${baseUrl}/v1/organizations/...`).
+> * **If you use Next.js Route Handlers** (like the standard web frontend), set `baseUrl: "/api/chat"` because the custom Next.js route handler at `/api/chat/[...path]` acts as a proxy that automatically strips the `/api/chat` prefix when forwarding to the backend.
+> * **If you use a direct API proxy** (like Vite's proxy configuration in `web-admin` or an Nginx rewrite rule that forwards `/api` directly to the backend), set `baseUrl: "/api"`. Passing `"/api/chat"` in this setup will cause the proxy to forward requests containing the `/chat` path segment directly to the backend (e.g. `POST /chat/v1/...`), causing a `404 Not Found` error.
 
 ### Wiring `getAuthHeaders` to your host app's auth
 
