@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { ChatAdapter } from "../types/adapter";
-import type { ChatConfig, ChatStrings } from "../types/config";
+import type { ChatConfig, ChatStrings, ChatTheme, ChatThemeSpecification } from "../types/config";
 import type { ChatPlugins } from "../types/plugins";
 import type { Session } from "../types/session";
 import type { ComposerAnnouncement } from "../types/chat";
@@ -28,6 +28,60 @@ interface ChatContextValue {
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
+
+const THEME_MAP: Record<keyof ChatTheme, string> = {
+  bg: "--chat-bg",
+  sidebarBg: "--chat-sidebar-bg",
+  artifactBg: "--artifact-bg",
+  border: "--chat-border",
+  accent: "--chat-accent",
+  accentHover: "--chat-accent-hover",
+  accentForeground: "--chat-accent-foreground",
+  messageUserBg: "--message-user-bg",
+  messageUserText: "--message-user-text",
+  messageAiBg: "--message-ai-bg",
+  messageAiText: "--message-ai-text",
+  muted: "--chat-muted",
+  radiusSm: "--chat-radius-sm",
+  radiusMd: "--chat-radius-md",
+  radiusLg: "--chat-radius-lg",
+  sidebarWidth: "--chat-sidebar-width",
+  artifactWidth: "--chat-artifact-width",
+};
+
+function generateThemeCss(themeOptions?: ChatThemeSpecification): string {
+  if (!themeOptions) return "";
+  let css = "";
+
+  if (themeOptions.light) {
+    css += `\n[data-chat-provider="ai-chat-sdk"] {\n`;
+    for (const [key, value] of Object.entries(themeOptions.light)) {
+      const cssVar = THEME_MAP[key as keyof ChatTheme];
+      if (cssVar && value) {
+        css += `  ${cssVar}: ${value};\n`;
+      }
+    }
+    css += `}\n`;
+  }
+
+  if (themeOptions.dark) {
+    const darkSelectors = [
+      `[data-chat-provider="ai-chat-sdk"][data-theme="dark"]`,
+      `:where(.dark) [data-chat-provider="ai-chat-sdk"]:not([data-theme="light"])`,
+    ];
+
+    css += `\n${darkSelectors.join(",\n")} {\n`;
+    for (const [key, value] of Object.entries(themeOptions.dark)) {
+      const cssVar = THEME_MAP[key as keyof ChatTheme];
+      if (cssVar && value) {
+        css += `  ${cssVar}: ${value};\n`;
+      }
+    }
+    css += `}\n`;
+  }
+
+  return css;
+}
 
 interface ChatProviderProps {
   children: React.ReactNode;
@@ -80,6 +134,7 @@ export function ChatProvider({
     enableSlashFocusShortcut: config.enableSlashFocusShortcut ?? true,
     defaultModel: config.defaultModel ?? "claude-sonnet-4-6",
     theme: config.theme ?? "system",
+    themeOptions: config.themeOptions ?? {},
   };
 
   const mergedStrings = useMemo(() => ({ ...defaultStrings, ...strings }), [strings]);
@@ -120,8 +175,13 @@ export function ChatProvider({
     ],
   );
 
+  const themeCss = useMemo(() => {
+    return generateThemeCss(config.themeOptions);
+  }, [config.themeOptions]);
+
   return (
     <div data-chat-provider="ai-chat-sdk" data-theme={mergedConfig.theme}>
+      {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
       <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
     </div>
   );

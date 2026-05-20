@@ -1575,6 +1575,77 @@ Import `styles-no-base.css` instead of `styles.css` to avoid a double CSS reset.
 
 ---
 
+## Whitelabeling & Custom Theming
+
+The SDK fully supports whitelabeling to seamlessly match the parent/host application's color theme, typography, and brand styles. You can customize colors, spacing, borders, panel widths, and message bubbles by passing a typed `themeOptions` configuration block inside `ChatConfig` to `ChatProvider`.
+
+Under the hood, the SDK converts the JavaScript theme configuration properties into standard CSS custom properties (CSS variables) dynamically, scope-safely applying them globally to all elements carrying `data-chat-provider="ai-chat-sdk"` (which includes standard chat layouts and Radix portal-rendered overlays like dropdowns, modals, and tooltips).
+
+### Example implementation
+
+```tsx
+import { ChatProvider, ChatShell } from "@anter/ai-chat-sdk";
+import { MyAdapter } from "./my-adapter";
+
+const adapter = new MyAdapter();
+
+export function WhitelabeledChat() {
+  return (
+    <ChatProvider
+      organizationId="my-org"
+      adapter={adapter}
+      config={{
+        theme: "system",
+        themeOptions: {
+          light: {
+            accent: "#8b5cf6", // Vibrant purple primary accent
+            accentHover: "#7c3aed",
+            accentForeground: "#ffffff",
+            radiusMd: "12px",
+            sidebarBg: "#f5f3ff",
+          },
+          dark: {
+            accent: "#a78bfa", // Soft purple primary accent for dark mode
+            accentHover: "#8b5cf6",
+            accentForeground: "#000000",
+            radiusMd: "12px",
+            sidebarBg: "#0f0c1b",
+          },
+        },
+      }}
+    >
+      <ChatShell />
+    </ChatProvider>
+  );
+}
+```
+
+### Available theme tokens
+
+Below is the list of JavaScript keys supported in the `ChatTheme` interface, their mapped CSS custom properties, and their roles in the UI:
+
+| JavaScript Key     | CSS Variable               | Purpose & UI Role                                                                               |
+| :----------------- | :------------------------- | :---------------------------------------------------------------------------------------------- |
+| `bg`               | `--chat-bg`                | Main background color for the chat viewport and messaging space.                                |
+| `sidebarBg`        | `--chat-sidebar-bg`        | Background color for the collapsible conversation history sidebar.                              |
+| `artifactBg`       | `--artifact-bg`            | Background color for the right-hand side document preview (artifact) panel.                     |
+| `border`           | `--chat-border`            | Color of layout borders (dividers between columns, input borders, tag card boundaries).         |
+| `accent`           | `--chat-accent`            | Primary brand/focus color (used for send buttons, selection states, active tabs, action links). |
+| `accentHover`      | `--chat-accent-hover`      | Hover color applied to active/interactive brand elements.                                       |
+| `accentForeground` | `--chat-accent-foreground` | Color of icons and text placed directly on top of accent-colored backgrounds.                   |
+| `messageUserBg`    | `--message-user-bg`        | Background color of user speech bubble blocks.                                                  |
+| `messageUserText`  | `--message-user-text`      | Color of text inside user speech bubble blocks.                                                 |
+| `messageAiBg`      | `--message-ai-bg`          | Background color of assistant message blocks (defaults to transparent).                         |
+| `messageAiText`    | `--message-ai-text`        | Color of text inside assistant message blocks.                                                  |
+| `muted`            | `--chat-muted`             | Secondary/muted color used for times, sub-headings, disabled icons, and minor details.          |
+| `radiusSm`         | `--chat-radius-sm`         | Small border radius applied to small components like action buttons and badge chips.            |
+| `radiusMd`         | `--chat-radius-md`         | Medium border radius applied to message bubbles and clickable suggestion starter cards.         |
+| `radiusLg`         | `--chat-radius-lg`         | Large border radius applied to major components such as the main composer input container.      |
+| `sidebarWidth`     | `--chat-sidebar-width`     | Base width of the left collapsible sidebar panel (e.g. `"288px"`).                              |
+| `artifactWidth`    | `--chat-artifact-width`    | Base/collapsed width of the right resizable panel area (e.g. `"400px"`).                        |
+
+---
+
 ## TypeScript
 
 All public types are exported from the `types` entry point:

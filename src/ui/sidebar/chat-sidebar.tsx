@@ -185,7 +185,7 @@ export function ChatSidebar({
     >
       <div className="ais-sidebar-header">
         <div className="ais-sidebar-brand">
-          <div className="ais-sidebar-brand-title">Anter</div>
+          <div className="ais-sidebar-brand-title">anter</div>
         </div>
 
         <button

@@ -1,3 +1,28 @@
+export interface ChatTheme {
+  bg?: string;
+  sidebarBg?: string;
+  artifactBg?: string;
+  border?: string;
+  accent?: string;
+  accentHover?: string;
+  accentForeground?: string;
+  messageUserBg?: string;
+  messageUserText?: string;
+  messageAiBg?: string;
+  messageAiText?: string;
+  muted?: string;
+  radiusSm?: string;
+  radiusMd?: string;
+  radiusLg?: string;
+  sidebarWidth?: string;
+  artifactWidth?: string;
+}
+
+export interface ChatThemeSpecification {
+  light?: ChatTheme;
+  dark?: ChatTheme;
+}
+
 export interface ChatConfig {
   enableArtifacts?: boolean;
   enableModelSelector?: boolean;
@@ -7,6 +32,7 @@ export interface ChatConfig {
   enableSlashFocusShortcut?: boolean;
   defaultModel?: string;
   theme?: "light" | "dark" | "system";
+  themeOptions?: ChatThemeSpecification;
 }
 
 export const defaultStrings = {
