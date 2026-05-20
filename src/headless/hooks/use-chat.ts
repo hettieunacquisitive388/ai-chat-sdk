@@ -118,7 +118,9 @@ function useProvideChat(onArtifactsReady?: (artifacts: Artifact[]) => void): Use
     persistentContextVariables,
   } = useChatContext();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [streamingState, setStreamingState] = useState<StreamingState>({ isStreaming: false });
+  const [streamingState, setStreamingState] = useState<StreamingState>({
+    isStreaming: false,
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -279,7 +281,10 @@ function useProvideChat(onArtifactsReady?: (artifacts: Artifact[]) => void): Use
             // context_resolved: the server resolved a required context value.
             // Accept both "contextId" (new) and "frameworkId" (legacy backend compat).
             if (outerEventType === "context_resolved" && parsed.payload) {
-              const { key, value } = parsed.payload as { key?: string; value?: string };
+              const { key, value } = parsed.payload as {
+                key?: string;
+                value?: string;
+              };
               if ((key === "contextId" || key === "frameworkId") && typeof value === "string") {
                 setActiveContext(value);
               }
@@ -445,7 +450,10 @@ function useProvideChat(onArtifactsReady?: (artifacts: Artifact[]) => void): Use
             }
           },
           onError() {
-            setStreamingState({ isStreaming: false, error: "Failed to parse stream event" });
+            setStreamingState({
+              isStreaming: false,
+              error: "Failed to parse stream event",
+            });
             setIsLoading(false);
           },
         });
@@ -563,7 +571,9 @@ function useProvideChat(onArtifactsReady?: (artifacts: Artifact[]) => void): Use
           sources: citations.length > 0 ? citations : msg.sources,
           records: records.length > 0 ? records : msg.records,
           ...(artifacts.length > 0
-            ? { artifactIds: [...(msg.artifactIds ?? []), ...artifacts.map((a) => a.artifactId)] }
+            ? {
+                artifactIds: [...(msg.artifactIds ?? []), ...artifacts.map((a) => a.artifactId)],
+              }
             : {}),
         };
       });

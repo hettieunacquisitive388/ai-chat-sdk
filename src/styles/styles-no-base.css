@@ -1180,6 +1180,12 @@
   height: 44px;
   max-height: 200px;
   transition: height 0.1s;
+  scrollbar-width: none; /* Hide scrollbar in Firefox and modern Chrome/Safari */
+  -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+}
+
+.ais-composer-input::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Webkit browsers (Chrome, Safari, etc.) */
 }
 
 .ais-composer-footer {

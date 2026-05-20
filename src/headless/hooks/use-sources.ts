@@ -19,7 +19,9 @@ export interface UseSourcesReturn {
 export function useSources(): UseSourcesReturn {
   const [activeMessageId, setActiveMessageId] = useState<string | undefined>();
   const [activeSources, setActiveSources] = useState<MessageSource[]>([]);
-  const [panelState, setPanelState] = useState<SourcesPanelState>({ isOpen: false });
+  const [panelState, setPanelState] = useState<SourcesPanelState>({
+    isOpen: false,
+  });
 
   const openSources = useCallback(
     (messageId: string, sources: MessageSource[], scrollToIndex?: number) => {

@@ -59,7 +59,10 @@ export function ChatComposer({ onSendMessage, isStreaming, className }: ChatComp
 
     let sessionId = currentSession?.sessionId;
     if (!sessionId) {
-      sessionId = await adapter.createSession({ organizationId, contextId: activeContextId });
+      sessionId = await adapter.createSession({
+        organizationId,
+        contextId: activeContextId,
+      });
       setCurrentSession({
         sessionId,
         title: "New conversation",

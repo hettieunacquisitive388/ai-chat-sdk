@@ -17,7 +17,11 @@ const TYPE_META: Record<string, { label: string; color: string }> = {
 
 const TABS_BY_TYPE: Record<
   string,
-  Array<{ value: "preview" | "source" | "export"; label: string; icon: React.ReactNode }>
+  Array<{
+    value: "preview" | "source" | "export";
+    label: string;
+    icon: React.ReactNode;
+  }>
 > = {
   markdown: [
     { value: "preview", label: "Preview", icon: <AlignLeft size={13} /> },
@@ -66,7 +70,9 @@ export function ArtifactPanel({ artifactsCtx, onExportArtifact, className }: Art
   const handleDownloadMarkdown = useCallback(() => {
     if (!activeArtifact) return;
     try {
-      const blob = new Blob([activeArtifact.content], { type: "text/markdown" });
+      const blob = new Blob([activeArtifact.content], {
+        type: "text/markdown",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

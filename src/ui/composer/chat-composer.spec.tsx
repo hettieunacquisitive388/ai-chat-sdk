@@ -23,7 +23,11 @@ describe("ChatComposer", () => {
       setActiveContext: jest.fn(),
       announcement: null,
       setAnnouncement: jest.fn(),
-      adapter: { uploadFile: undefined, deleteSessionFile: undefined, createSession: jest.fn() },
+      adapter: {
+        uploadFile: undefined,
+        deleteSessionFile: undefined,
+        createSession: jest.fn(),
+      },
       organizationId: "org-123",
     });
   });
@@ -50,7 +54,11 @@ describe("ChatComposer", () => {
       setActiveContext: jest.fn(),
       announcement: null,
       setAnnouncement: jest.fn(),
-      adapter: { uploadFile: undefined, deleteSessionFile: undefined, createSession: jest.fn() },
+      adapter: {
+        uploadFile: undefined,
+        deleteSessionFile: undefined,
+        createSession: jest.fn(),
+      },
       organizationId: "org-123",
     });
     render(<ChatComposer onSendMessage={mockOnSendMessage} />);

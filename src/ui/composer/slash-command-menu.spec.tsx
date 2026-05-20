@@ -11,9 +11,24 @@ jest.mock("../../extensions/slash-command-registry", () => ({
 
 describe("SlashCommandMenu", () => {
   const mockCommands = [
-    { name: "/gap", description: "Gap analysis", slashCommandId: "gap", onSelect: jest.fn() },
-    { name: "/risk", description: "Risk analysis", slashCommandId: "risk", onSelect: jest.fn() },
-    { name: "/help", description: "Help", slashCommandId: "help", onSelect: jest.fn() },
+    {
+      name: "/gap",
+      description: "Gap analysis",
+      slashCommandId: "gap",
+      onSelect: jest.fn(),
+    },
+    {
+      name: "/risk",
+      description: "Risk analysis",
+      slashCommandId: "risk",
+      onSelect: jest.fn(),
+    },
+    {
+      name: "/help",
+      description: "Help",
+      slashCommandId: "help",
+      onSelect: jest.fn(),
+    },
   ];
 
   const defaultProps = {

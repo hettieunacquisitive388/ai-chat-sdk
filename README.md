@@ -6,8 +6,8 @@ An industry-agnostic, embeddable AI chat SDK for React applications. Drop a full
 
 ## Screenshots
 
-| Empty state | Streaming response with sources | Artifact panel |
-|:-----------:|:-------------------------------:|:--------------:|
+|                                                                       Empty state                                                                        |                                               Streaming response with sources                                                |                                          Artifact panel                                          |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: |
 | ![ChatShell empty state — sidebar with New Chat, Search, Chats, and Platform nav; centred prompt with slash-command hint](.github/assets/anter-ai-1.png) | ![ChatShell with an AI response citing 4 inline sources and a Sources pill below the message](.github/assets/anter-ai-2.png) | ![ChatShell with the Files artifact panel open on the right side](.github/assets/anter-ai-3.png) |
 
 ---
@@ -154,10 +154,10 @@ echo "  3. Smoke test: pnpm --filter your-app build"
 
 **The invariant to maintain:**
 
-| Path | Owner | Rule |
-|---|---|---|
-| `src/` | Upstream | Never edit locally — always contribute back first, then sync |
-| `package.json`, `tsconfig.json`, `eslint.config.mjs` | Your workspace | Local adaptations — never overwritten by the sync script |
+| Path                                                 | Owner          | Rule                                                         |
+| ---------------------------------------------------- | -------------- | ------------------------------------------------------------ |
+| `src/`                                               | Upstream       | Never edit locally — always contribute back first, then sync |
+| `package.json`, `tsconfig.json`, `eslint.config.mjs` | Your workspace | Local adaptations — never overwritten by the sync script     |
 
 To fix a bug or add a feature: open a PR on `anter-ai/ai-chat-sdk`, get it merged, then run `sync-upstream.sh`.
 
@@ -198,7 +198,10 @@ class MyAdapter implements ChatAdapter {
     const res = await fetch("/api/sessions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contextId: config.contextId, model: config.model }),
+      body: JSON.stringify({
+        contextId: config.contextId,
+        model: config.model,
+      }),
     });
     const { sessionId } = await res.json();
     return sessionId;
@@ -229,7 +232,10 @@ class MyAdapter implements ChatAdapter {
   async sendMessage(payload: MessagePayload): Promise<ReadableStream<Uint8Array>> {
     const res = await fetch("/api/chat/stream", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+      },
       body: JSON.stringify(payload),
     });
     if (!res.body) throw new Error("Missing response body");
@@ -324,7 +330,7 @@ The root context provider. Must wrap all other SDK components.
 > ```tsx
 > // Multi-tenant — org is in the URL
 > <ChatProvider organizationId={params.orgId} adapter={adapter}>
-> 
+>
 > // Single-tenant or admin context — use a stable constant
 > <ChatProvider organizationId="platform-admin" adapter={adapter}>
 > ```
@@ -367,7 +373,14 @@ A full-page chat interface with a collapsible sidebar, resizable panels for sour
 ```tsx
 <ChatShell
   emptyState={<MyEmptyState />}
-  tips={[{ id: "tip-1", type: "info", title: "Press / for slash commands", dismissible: true }]}
+  tips={[
+    {
+      id: "tip-1",
+      type: "info",
+      title: "Press / for slash commands",
+      dismissible: true,
+    },
+  ]}
   initialSessionId="session-abc"
   onSessionChange={(id) => router.replace(`/chat/${id ?? ""}`)}
   onExportArtifact={async (artifactId) => {
@@ -688,7 +701,10 @@ export async function POST(req: Request) {
   });
 
   return new Response(stream, {
-    headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+    },
   });
 }
 ```
@@ -1412,19 +1428,20 @@ const adapter = new AskInfosecAdapter({
 
 **Constructor options:**
 
-| Option           | Type                         | Required | Description                                                                                                     |
-| ---------------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| Option           | Type                         | Required | Description                                                                                                       |
+| ---------------- | ---------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
 | `baseUrl`        | `string`                     | Yes      | Base URL for all API requests (e.g. `"/api/chat"` for Next.js route proxying, or `"/api"` for direct API proxies) |
-| `organizationId` | `string`                     | Yes      | Tenant identifier                                                                                               |
-| `projectId`      | `string`                     | No       | Targets a specific Agent Builder project                                                                        |
-| `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent                                                               |
-| `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request                                                                          |
+| `organizationId` | `string`                     | Yes      | Tenant identifier                                                                                                 |
+| `projectId`      | `string`                     | No       | Targets a specific Agent Builder project                                                                          |
+| `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent                                                                 |
+| `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request                                                                            |
 
 > [!IMPORTANT]
 > **Understanding the `baseUrl` path prefix:**
 > The `AskInfosecAdapter` appends the standard backend routes directly to `baseUrl` (e.g., `${baseUrl}/v1/organizations/...`).
-> * **If you use Next.js Route Handlers** (like the standard web frontend), set `baseUrl: "/api/chat"` because the custom Next.js route handler at `/api/chat/[...path]` acts as a proxy that automatically strips the `/api/chat` prefix when forwarding to the backend.
-> * **If you use a direct API proxy** (like Vite's proxy configuration in `web-admin` or an Nginx rewrite rule that forwards `/api` directly to the backend), set `baseUrl: "/api"`. Passing `"/api/chat"` in this setup will cause the proxy to forward requests containing the `/chat` path segment directly to the backend (e.g. `POST /chat/v1/...`), causing a `404 Not Found` error.
+>
+> - **If you use Next.js Route Handlers** (like the standard web frontend), set `baseUrl: "/api/chat"` because the custom Next.js route handler at `/api/chat/[...path]` acts as a proxy that automatically strips the `/api/chat` prefix when forwarding to the backend.
+> - **If you use a direct API proxy** (like Vite's proxy configuration in `web-admin` or an Nginx rewrite rule that forwards `/api` directly to the backend), set `baseUrl: "/api"`. Passing `"/api/chat"` in this setup will cause the proxy to forward requests containing the `/chat` path segment directly to the backend (e.g. `POST /chat/v1/...`), causing a `404 Not Found` error.
 
 ### Wiring `getAuthHeaders` to your host app's auth
 

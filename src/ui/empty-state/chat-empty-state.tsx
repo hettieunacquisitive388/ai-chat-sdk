@@ -45,7 +45,10 @@ export function ChatEmptyState({
               >
                 <div
                   className="ais-starter-card-icon"
-                  style={{ color: card.iconColor, background: `${card.iconColor}18` }}
+                  style={{
+                    color: card.iconColor,
+                    background: `${card.iconColor}18`,
+                  }}
                 >
                   {card.icon}
                 </div>

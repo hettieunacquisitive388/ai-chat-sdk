@@ -56,5 +56,13 @@ export function useSessionFiles(): UseSessionFilesReturn {
     [adapter, sessionId, refresh],
   );
 
-  return { files, isLoading, panelOpen, openPanel, closePanel, refresh, deleteFile };
+  return {
+    files,
+    isLoading,
+    panelOpen,
+    openPanel,
+    closePanel,
+    refresh,
+    deleteFile,
+  };
 }

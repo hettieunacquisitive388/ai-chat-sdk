@@ -11,7 +11,9 @@ export function ResizableHandle({
   className = "",
   withHandle = false,
   ...props
-}: React.ComponentProps<typeof ResizablePrimitive.Separator> & { withHandle?: boolean }) {
+}: React.ComponentProps<typeof ResizablePrimitive.Separator> & {
+  withHandle?: boolean;
+}) {
   return (
     <ResizablePrimitive.Separator className={`ais-resizable-handle ${className}`} {...props}>
       {withHandle && (
