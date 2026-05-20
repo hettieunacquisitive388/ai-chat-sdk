@@ -18,6 +18,7 @@ An industry-agnostic, embeddable AI chat SDK for React applications. Drop a full
 - [Why this SDK?](#why-this-sdk)
 - [Requirements](#requirements)
 - [Installation](#installation)
+  - [Vendoring before npm publish](#vendoring-before-the-package-is-published-to-npm)
 - [Quick start](#quick-start)
 - [Components](#components)
   - [ChatProvider](#chatprovider)
@@ -52,6 +53,7 @@ It ships in layered entry points so you can take exactly what you need:
 | Import path                             | What you get                                                               |
 | --------------------------------------- | -------------------------------------------------------------------------- |
 | `@anter/ai-chat-sdk`                    | Everything: UI components + headless hooks + extensions                    |
+| `@anter/ai-chat-sdk/ui`                 | UI components only (`ChatShell`, `ChatWidget`, `RecordPanel`, …)           |
 | `@anter/ai-chat-sdk/headless`           | Hooks and context only, no UI (`useChat`, `useArtifacts`, `useSources`, …) |
 | `@anter/ai-chat-sdk/adapters`           | The built-in `AskInfosecAdapter` reference implementation                  |
 | `@anter/ai-chat-sdk/types`              | TypeScript type definitions only                                           |
@@ -97,6 +99,67 @@ For external consumers (once published):
 ```bash
 npm install @anter/ai-chat-sdk
 ```
+
+### Vendoring before the package is published to npm
+
+If you need to embed the SDK before it appears on the npm registry, copy the `src/` directory into your own monorepo as a local workspace package. The build tooling (`tsup`, `tsc`, CSS copy) is fully standalone — it has no private or internal dependencies.
+
+**Step 1 — copy `src/` into your workspace:**
+
+```bash
+# From your monorepo root
+mkdir -p packages/ai-chat-sdk
+cp -r /path/to/ai-chat-sdk/src packages/ai-chat-sdk/src
+```
+
+Copy the build config files alongside it (`tsup.config.ts`, `tsconfig.json`, `tsconfig.build.json`, `jest.config.cjs`, `package.json`, `eslint.config.mjs`). These files contain no private references and work as-is.
+
+**Step 2 — add a workspace reference from your app:**
+
+```json
+// your-app/package.json
+{
+  "dependencies": {
+    "@anter/ai-chat-sdk": "workspace:*"
+  }
+}
+```
+
+**Step 3 — add a sync script to pull in upstream changes:**
+
+Create a `sync-upstream.sh` in your local copy. The key rule is: **only sync `src/`** — the config files are yours to own.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+UPSTREAM="https://github.com/anter-ai/ai-chat-sdk.git"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMP=$(mktemp -d)
+trap "rm -rf '$TEMP'" EXIT
+
+echo "Cloning upstream..."
+git clone --depth 1 "$UPSTREAM" "$TEMP"
+
+echo "Syncing src/..."
+rsync -av --delete "$TEMP/src/" "$SCRIPT_DIR/src/"
+
+UPSTREAM_VERSION=$(node -p "require('$TEMP/package.json').version")
+echo "Done. Upstream version: $UPSTREAM_VERSION"
+echo "Next steps:"
+echo "  1. Review: git diff packages/ai-chat-sdk/src"
+echo "  2. Rebuild: pnpm --filter @anter/ai-chat-sdk build"
+echo "  3. Smoke test: pnpm --filter your-app build"
+```
+
+**The invariant to maintain:**
+
+| Path | Owner | Rule |
+|---|---|---|
+| `src/` | Upstream | Never edit locally — always contribute back first, then sync |
+| `package.json`, `tsconfig.json`, `eslint.config.mjs` | Your workspace | Local adaptations — never overwritten by the sync script |
+
+To fix a bug or add a feature: open a PR on `anter-ai/ai-chat-sdk`, get it merged, then run `sync-upstream.sh`.
 
 ---
 
@@ -256,6 +319,16 @@ The root context provider. Must wrap all other SDK components.
 | `config`         | `ChatConfig`           | No       | Feature flags and UI defaults (see below)             |
 | `strings`        | `Partial<ChatStrings>` | No       | Override any UI copy (see below)                      |
 
+> **`organizationId` when there is no per-org routing:** If your application does not have per-tenant URLs (e.g. a platform admin console, a single-tenant deployment, or a white-label product with no org scoping), pass any stable string that your backend will recognise — the value is forwarded to your adapter on every call and is otherwise opaque to the SDK. Common choices are `"default"`, your product slug, or an internal platform identifier.
+>
+> ```tsx
+> // Multi-tenant — org is in the URL
+> <ChatProvider organizationId={params.orgId} adapter={adapter}>
+> 
+> // Single-tenant or admin context — use a stable constant
+> <ChatProvider organizationId="platform-admin" adapter={adapter}>
+> ```
+
 **`config` options:**
 
 | Option                     | Type                            | Default               | Description                                                       |
@@ -316,6 +389,27 @@ A full-page chat interface with a collapsible sidebar, resizable panels for sour
 | `onRecordClick`    | `(record: RecordTag) => void`           | Called when the user clicks an inline record chip                                                     |
 | `recordPanel`      | `React.ReactNode`                       | Custom panel content rendered in the right resizable pane (replaces the artifact panel when provided) |
 | `className`        | `string`                                | Additional CSS class on the shell root element                                                        |
+
+> **Height requirement:** `ChatShell` manages its own internal scroll and resizable panel layout. It must be rendered inside a container with an explicit, bounded height — a flex parent with `flex: 1` or `height: 100%`. Without a bounded height the resizable panels have nothing to fill and will collapse.
+>
+> ```tsx
+> // ✅ Correct — parent provides explicit height
+> <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+>   <ChatShell />
+> </div>
+>
+> // ✅ Also correct — flex child expanding to fill available space
+> <main style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+>   <ChatShell />
+> </main>
+>
+> // ❌ Incorrect — no bounded height, panels collapse
+> <div>
+>   <ChatShell />
+> </div>
+> ```
+>
+> If you are embedding `ChatShell` inside a page layout that already provides a scrollable `overflow-y: auto` container, wrap it with `overflow: hidden` on the parent so `ChatShell`'s internal scroll takes over from the page scroll.
 
 **`ComposerAnnouncement` shape:**
 
@@ -1325,6 +1419,57 @@ const adapter = new AskInfosecAdapter({
 | `projectId`      | `string`                     | No       | Targets a specific Agent Builder project           |
 | `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent  |
 | `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request             |
+
+### Wiring `getAuthHeaders` to your host app's auth
+
+`getAuthHeaders` is called before every API request. The simplest framework-agnostic pattern is to expose a module-level setter and getter so the adapter can reach the host app's token provider without importing auth libraries directly:
+
+```typescript
+// lib/api-token.ts
+let tokenProvider: (() => Promise<string | null>) | null = null;
+
+export function setApiTokenProvider(fn: () => Promise<string | null>) {
+  tokenProvider = fn;
+}
+
+export function getApiToken(): Promise<string | null> {
+  return tokenProvider ? tokenProvider().catch(() => null) : Promise.resolve(null);
+}
+```
+
+```typescript
+// auth/provider.tsx — call this once when auth initialises
+import { setApiTokenProvider } from "../lib/api-token";
+
+// Example: MSAL (Azure AD)
+setApiTokenProvider(() => acquireAccessToken(msalInstance, account));
+
+// Example: Supabase
+setApiTokenProvider(async () => {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
+});
+
+// Example: static dev token
+setApiTokenProvider(async () => process.env.DEV_TOKEN ?? null);
+```
+
+```typescript
+// chat/adapter.ts
+import { AskInfosecAdapter } from "@anter/ai-chat-sdk/adapters";
+import { getApiToken } from "../lib/api-token";
+
+export const adapter = new AskInfosecAdapter({
+  baseUrl: "/api/chat",
+  organizationId: "org-123",
+  getAuthHeaders: async () => {
+    const token = await getApiToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  },
+});
+```
+
+This pattern works in any framework (Next.js, Vite, Remix, plain React) without importing auth libraries into the adapter file. The same pattern applies when writing a custom `ChatAdapter` from scratch.
 
 **Routing:**
 
