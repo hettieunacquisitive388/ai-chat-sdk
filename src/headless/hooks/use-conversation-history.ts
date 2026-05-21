@@ -10,6 +10,7 @@ export function useConversationHistory() {
   const [isLoading, setIsLoading] = useState(false);
 
   const refresh = useCallback(async () => {
+    if (!adapter?.listSessions) return;
     setIsLoading(true);
     try {
       const result = await adapter.listSessions({ page: 1, limit: 50 });
@@ -25,6 +26,7 @@ export function useConversationHistory() {
 
   const deleteSession = useCallback(
     async (sessionId: string) => {
+      if (!adapter?.deleteSession) return;
       await adapter.deleteSession(sessionId);
       await refresh();
     },
