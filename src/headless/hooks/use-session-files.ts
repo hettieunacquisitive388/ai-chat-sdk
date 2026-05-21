@@ -15,7 +15,7 @@ export interface UseSessionFilesReturn {
 }
 
 export function useSessionFiles(): UseSessionFilesReturn {
-  const { adapter, currentSession } = useChatContext();
+  const { adapter, currentSession, config } = useChatContext();
   const [files, setFiles] = useState<ChatSessionFileRef[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -23,7 +23,7 @@ export function useSessionFiles(): UseSessionFilesReturn {
   const sessionId = currentSession?.sessionId;
 
   const refresh = useCallback(async () => {
-    if (!sessionId || !adapter.listSessionFiles) return;
+    if (!sessionId || !adapter.listSessionFiles || !config.enableFileUpload) return;
     setIsLoading(true);
     try {
       const result = await adapter.listSessionFiles(sessionId);
@@ -38,8 +38,8 @@ export function useSessionFiles(): UseSessionFilesReturn {
   // Single effect covers both cases: session change AND panel open.
   // Having two separate effects caused a double fetch when sessionId changed while panelOpen was true.
   useEffect(() => {
-    if (sessionId) void refresh();
-  }, [panelOpen, sessionId, refresh]);
+    if (sessionId && config.enableFileUpload) void refresh();
+  }, [panelOpen, sessionId, refresh, config.enableFileUpload]);
 
   const openPanel = useCallback(() => setPanelOpen(true), []);
   const closePanel = useCallback(() => setPanelOpen(false), []);
