@@ -7,10 +7,10 @@ import type {
   SessionList,
   SessionPatch,
   UploadFileOptions,
-} from "../headless/types/adapter";
-import type { MessageSource } from "../headless/types/chat";
-import type { SessionWithMessages } from "../headless/types/session";
-import { registerSlashCommand } from "../extensions/slash-command-registry";
+} from "@anter/ai-chat-sdk/types";
+import type { MessageSource } from "@anter/ai-chat-sdk/types";
+import type { SessionWithMessages } from "@anter/ai-chat-sdk/types";
+import { registerSlashCommand } from "@anter/ai-chat-sdk";
 
 // Maps SDK contextId values → AskInfosec backend framework codes.
 const CONTEXT_ID_TO_FRAMEWORK_CODE: Record<string, string> = {
@@ -28,7 +28,7 @@ const CONTEXT_ID_TO_FRAMEWORK_CODE: Record<string, string> = {
   tsa: "tsa_cybersecurity",
 };
 
-interface AskInfosecAdapterOptions {
+interface AnterAdapterOptions {
   baseUrl: string;
   organizationId: string;
   projectId?: string;
@@ -37,8 +37,8 @@ interface AskInfosecAdapterOptions {
   getAuthHeaders: () => Promise<HeadersInit>;
 }
 
-export class AskInfosecAdapter implements ChatAdapter {
-  constructor(private readonly opts: AskInfosecAdapterOptions) {}
+export class AnterAdapter implements ChatAdapter {
+  constructor(private readonly opts: AnterAdapterOptions) {}
 
   private get apiBase(): string {
     if (this.opts.projectId && this.opts.agentId) {
@@ -51,7 +51,7 @@ export class AskInfosecAdapter implements ChatAdapter {
     return `${this.apiBase}/memory/sessions`;
   }
 
-  async createSession(config: SessionConfig): Promise<string> {
+  async createSession(_config: SessionConfig): Promise<string> {
     return crypto.randomUUID();
   }
 
@@ -119,7 +119,7 @@ export class AskInfosecAdapter implements ChatAdapter {
     };
   }
 
-  async listSessions(params?: ListParams): Promise<SessionList> {
+  async listSessions(_params?: ListParams): Promise<SessionList> {
     const userSuffix = this.opts.userId ? `?userId=${encodeURIComponent(this.opts.userId)}` : "";
     const response = await this.request(`${this.memoryBase}${userSuffix}`, "GET");
     const json = (await response.json()) as Array<{
@@ -337,3 +337,8 @@ export class AskInfosecAdapter implements ChatAdapter {
     return response;
   }
 }
+
+/**
+ * @deprecated Use `AnterAdapter` instead. This alias will be removed in a future release.
+ */
+export const AskInfosecAdapter = AnterAdapter;

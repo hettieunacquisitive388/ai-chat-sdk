@@ -37,7 +37,7 @@ An industry-agnostic, embeddable AI chat SDK for React applications. Drop a full
 - [Headless hooks](#headless-hooks)
 - [Artifacts](#artifacts)
 - [Record tags](#record-tags)
-- [AskInfosecAdapter (reference implementation)](#askinfosecadapter-reference-implementation)
+- [AnterAdapter](#anteradapter)
 - [Development](#development)
 - [CSS architecture](#css-architecture)
 - [TypeScript](#typescript)
@@ -55,7 +55,6 @@ It ships in layered entry points so you can take exactly what you need:
 | `@anter/ai-chat-sdk`                    | Everything: UI components + headless hooks + extensions                    |
 | `@anter/ai-chat-sdk/ui`                 | UI components only (`ChatShell`, `ChatWidget`, `RecordPanel`, …)           |
 | `@anter/ai-chat-sdk/headless`           | Hooks and context only, no UI (`useChat`, `useArtifacts`, `useSources`, …) |
-| `@anter/ai-chat-sdk/adapters`           | The built-in `AskInfosecAdapter` reference implementation                  |
 | `@anter/ai-chat-sdk/types`              | TypeScript type definitions only                                           |
 | `@anter/ai-chat-sdk/styles.css`         | Full stylesheet (includes CSS reset/base)                                  |
 | `@anter/ai-chat-sdk/styles-no-base.css` | Stylesheet without base resets                                             |
@@ -1408,14 +1407,14 @@ The `subject` value is converted from kebab-case to Title Case for display (e.g.
 
 ---
 
-## `AskInfosecAdapter` (reference implementation)
+## AnterAdapter
 
-The built-in `AskInfosecAdapter` connects to the AskInfosec backend. Study it when building your own adapter — it demonstrates the full `ChatAdapter` contract, backward-compatibility mappings, and optional method implementations.
+The `AnterAdapter` is the official Anter backend adapter for this SDK. It lives in the sibling [`@anter/anter-adapter`](../packages/anter-adapter) package to keep this SDK generic and domain-agnostic.
 
 ```typescript
-import { AskInfosecAdapter } from "@anter/ai-chat-sdk/adapters";
+import { AnterAdapter } from "@anter/anter-adapter";
 
-const adapter = new AskInfosecAdapter({
+const adapter = new AnterAdapter({
   baseUrl: "/api/chat",
   organizationId: "org-123",
   projectId: "proj-456", // Optional — targets a specific project's agent
@@ -1426,87 +1425,7 @@ const adapter = new AskInfosecAdapter({
 });
 ```
 
-**Constructor options:**
-
-| Option           | Type                         | Required | Description                                                                                                       |
-| ---------------- | ---------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `baseUrl`        | `string`                     | Yes      | Base URL for all API requests (e.g. `"/api/chat"` for Next.js route proxying, or `"/api"` for direct API proxies) |
-| `organizationId` | `string`                     | Yes      | Tenant identifier                                                                                                 |
-| `projectId`      | `string`                     | No       | Targets a specific Agent Builder project                                                                          |
-| `agentId`        | `string`                     | No       | Pairs with `projectId` to target a specific agent                                                                 |
-| `getAuthHeaders` | `() => Promise<HeadersInit>` | Yes      | Returns auth headers for every request                                                                            |
-
-> [!IMPORTANT]
-> **Understanding the `baseUrl` path prefix:**
-> The `AskInfosecAdapter` appends the standard backend routes directly to `baseUrl` (e.g., `${baseUrl}/v1/organizations/...`).
->
-> - **If you use Next.js Route Handlers** (like the standard web frontend), set `baseUrl: "/api/chat"` because the custom Next.js route handler at `/api/chat/[...path]` acts as a proxy that automatically strips the `/api/chat` prefix when forwarding to the backend.
-> - **If you use a direct API proxy** (like Vite's proxy configuration in `web-admin` or an Nginx rewrite rule that forwards `/api` directly to the backend), set `baseUrl: "/api"`. Passing `"/api/chat"` in this setup will cause the proxy to forward requests containing the `/chat` path segment directly to the backend (e.g. `POST /chat/v1/...`), causing a `404 Not Found` error.
-
-### Wiring `getAuthHeaders` to your host app's auth
-
-`getAuthHeaders` is called before every API request. The simplest framework-agnostic pattern is to expose a module-level setter and getter so the adapter can reach the host app's token provider without importing auth libraries directly:
-
-```typescript
-// lib/api-token.ts
-let tokenProvider: (() => Promise<string | null>) | null = null;
-
-export function setApiTokenProvider(fn: () => Promise<string | null>) {
-  tokenProvider = fn;
-}
-
-export function getApiToken(): Promise<string | null> {
-  return tokenProvider ? tokenProvider().catch(() => null) : Promise.resolve(null);
-}
-```
-
-```typescript
-// auth/provider.tsx — call this once when auth initialises
-import { setApiTokenProvider } from "../lib/api-token";
-
-// Example: MSAL (Azure AD)
-setApiTokenProvider(() => acquireAccessToken(msalInstance, account));
-
-// Example: Supabase
-setApiTokenProvider(async () => {
-  const { data } = await supabase.auth.getSession();
-  return data.session?.access_token ?? null;
-});
-
-// Example: static dev token
-setApiTokenProvider(async () => process.env.DEV_TOKEN ?? null);
-```
-
-```typescript
-// chat/adapter.ts
-import { AskInfosecAdapter } from "@anter/ai-chat-sdk/adapters";
-import { getApiToken } from "../lib/api-token";
-
-export const adapter = new AskInfosecAdapter({
-  baseUrl: "/api/chat",
-  organizationId: "org-123",
-  getAuthHeaders: async () => {
-    const token = await getApiToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  },
-});
-```
-
-This pattern works in any framework (Next.js, Vite, Remix, plain React) without importing auth libraries into the adapter file. The same pattern applies when writing a custom `ChatAdapter` from scratch.
-
-**Routing:**
-
-- When both `projectId` and `agentId` are set, API calls go to `/v1/external/projects/{projectId}/agents/{agentId}`.
-- Without them, calls go to `/v1/organizations/{organizationId}/agent-builder`.
-
-**Additional methods (AskInfosec-specific, not part of the `ChatAdapter` interface):**
-
-- **`checkFrameworkActive(organizationId, contextId)`** — checks whether a GRC framework is active for the given org. Returns `boolean | undefined` (undefined on network error or unknown `contextId`).
-- **`loadSlashCommands()`** — fetches slash commands from the AskInfosec API and registers them in the global slash command registry.
-
-**Backward-compatibility mapping:**
-
-The adapter maps the SDK's generic `contextId` context variable to the AskInfosec backend's legacy `frameworkId` field before sending each message. This is transparent to the SDK layer and does not affect other adapters.
+See the [`@anter/anter-adapter` README](../packages/anter-adapter/README.md) for full documentation including constructor options, auth wiring patterns, routing details, and Anter-specific methods.
 
 ---
 
@@ -1549,7 +1468,6 @@ pnpm check-all   # format + lint + types + build in sequence
 | -------------------------------- | --------------------------------------------------------- |
 | `dist/index.js`                  | `src/index.ts` — all exports (UI + headless + extensions) |
 | `dist/headless/index.js`         | `src/headless/index.ts` — hooks and types only            |
-| `dist/adapters/index.js`         | `src/adapters/index.ts` — `AskInfosecAdapter`             |
 | `dist/styles/styles.css`         | `src/styles/styles.css`                                   |
 | `dist/styles/styles-no-base.css` | `src/styles/styles-no-base.css`                           |
 

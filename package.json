@@ -21,11 +21,6 @@
       "import": "./dist/ui/index.js",
       "default": "./dist/ui/index.js"
     },
-    "./adapters": {
-      "types": "./dist/adapters/index.d.ts",
-      "import": "./dist/adapters/index.js",
-      "default": "./dist/adapters/index.js"
-    },
     "./types": {
       "types": "./dist/headless/types/index.d.ts",
       "import": "./dist/headless/types/index.js",
