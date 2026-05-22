@@ -33,6 +33,7 @@ interface AskInfosecAdapterOptions {
   organizationId: string;
   projectId?: string;
   agentId?: string;
+  userId?: string;
   getAuthHeaders: () => Promise<HeadersInit>;
 }
 
@@ -187,6 +188,7 @@ export class AskInfosecAdapter implements ChatAdapter {
         contextVariables: {
           ...backendContextVars,
           sessionId: payload.sessionId,
+          ...(this.opts.userId ? { userId: this.opts.userId } : {}),
         },
       },
       {
